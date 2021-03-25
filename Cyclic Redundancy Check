@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+void main()
+{
+//declaration
+    int i,j,genlen,msglen,finlen,count;
+	char M[100], G[30],temp[30],quot[100],R[30],G1[30],T[30];
+//reading M(x)
+	printf("Enter Message: ");
+	gets(M);
+//reading G(x)
+	printf("Enter Generator Polynomial: ");
+	gets(G);
+//calculating lengths of the polynomials
+	genlen = strlen(G);
+	msglen = strlen(M);
+//
+	strcpy(G1,G);
+//computing S(x) - M(x) is now S(x)
+	for(i = 0; i < (genlen - 1); i++)
+		M[msglen + i] = '0';
+//reading S(x) into a temporary array
+	for(i = 0; i < genlen; i++)
+	    temp[i] = M[i];
+//Finding remainder through modulo-2 division
+	for(i = 0; i < msglen; i++){
+		quot[i] = temp[0];
+		if(quot[i] == '0'){
+		    for(j = 0;j < genlen; j++)
+		        G[j] = '0';
+		}
+		else{
+		    for(j=0;j<genlen;j++)
+		        G[j] = G1[j];
+		}
+		for(j = (genlen-1);j > 0;j--) {
+			if(temp[j] == G[j])
+			    R[j-1]='0';
+			else
+			    R[j-1]='1';
+		}
+		R[genlen-1] = M[i+genlen];
+		strcpy(temp,R);
+	}
+	strcpy(R,temp);
+//display
+	printf("\nRemainder R(x) is ");
+	for(i = 0;i < (genlen-1); i++)
+	    printf("%c",R[i]);
+	printf("\nTransmitted codeword T(x) is: ");
+	for (i=0;i<msglen;i++)
+	    printf("%c",M[i]);
+	for (i=0;i<genlen-1;i++)
+	    printf("%c",R[i]);
+}
