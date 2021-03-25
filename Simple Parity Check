@@ -1,0 +1,98 @@
+//C program for simple parity check
+
+#include<stdio.h>
+#include<math.h>
+
+int sender(int[100][100], int);
+int trans_med(int[100][100], int, int);
+int receiver(int[100][100], int, int);
+int no;
+
+int main(){
+	int h,i,j,l,code[100][100], data[100][100],k, count = 0;
+	printf("\nSimple Parity Check\n\n");
+	printf("Enter the length of the data word: ");
+	scanf("%d",&l);
+	no = pow(2,l);
+	for(i = 0; i < no; i++){
+		k = l - 1;
+		h = i;
+		while(h > 0){
+			int rem = h % 2;
+			data[i][k] = rem;
+			code[i][k--] = rem;
+			h = h/2;
+		}
+	}
+	for(i=0; i<no ; i++){
+		count = 0;
+		for(j = 0; j<l ; j++){
+			if(data[i][j] == 1)
+				count++;
+		}
+		if(count%2 == 1)
+			code[i][j] = 1;
+		else
+			code[i][j] = 0;
+	}
+	printf("Data words code words:\n");
+	for(i = 0;i < no; i++){
+		for(j = 0; j < l; j++)
+			printf("%d", data[i][j]);
+		printf(" \t ");
+		for (j = 0; j < l + 1; j++)
+			printf("%d", code[i][j]);	
+		printf("\n");
+	}
+	printf("\n");
+	sender(code, l);
+}
+
+int sender(int code[100][100], int l){
+	int word;
+	printf("At Sender's side\n");
+	printf("Choose a code word\n");
+	scanf("%d", &word);
+	printf("The selected code word is:");
+	for(int i = 0; i < l + 1; i++)
+		printf("%d", code[word][i]);
+	printf("\n\n");
+	trans_med(code, word, l);
+}
+
+int trans_med(int code[100][100], int word, int l){
+	int ch = 0;
+	printf("At Transmission Medium Select type of Error\n");
+	printf(" 1.No Error\n 2.1 Bit Error\n");
+	printf("Enter choice:");
+	scanf("%d", &ch);
+	printf("\n");
+	switch (ch){
+		case 1: receiver(code, word, l); break;
+		case 2: if (code[word][1] == 1)
+				code[word][1] = 0;
+			else
+				code[word][1] = 1;
+			receiver(code, word, l);
+			break;
+	}
+}
+
+int receiver(int code[100][100], int word, int l){
+	int s = 0;
+	printf("At receivers side\n");
+	for (int i = 0; i < l + 1; i++){
+		if (code[word][i] == 1)
+			s++;
+	}
+	if (s % 2 == 0){
+		printf("Syndrome bit is %d\nNo Error occured during transmission\nData is accepted\n", (s % 2));
+		printf("The Data word is:");
+		for (int j = 0; j < l; j++)
+			printf("%d", code[word][j]);
+		printf("\n");
+	}
+	else{
+		printf("Syndrome bit is %d\nError occured during transmission\nData is discarded\n", (s % 2));
+	}
+}
