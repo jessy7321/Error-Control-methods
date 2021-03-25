@@ -1,0 +1,135 @@
+#include<stdio.h>
+#include<math.h>
+
+void dec();
+void bin(int);
+void addBinary(int [], int []);
+void comp(int []);
+
+int len = 0, b1[10] = {0}, l1 = 0, l2 = 0, wsum[10] = {0}, csum[10] = {0}, deci = 0, nsum = 0, c = 0;
+
+void main(){
+	int n, i, sum = 0, b = 0, a[10] = {0}, num1[10] = {0}, num2[10] = {0};
+	printf("Enter the value of n:");
+	scanf("%d",&n);
+	printf("Enter the numbers: ");
+	//reading numbers and calculating their sum
+	for(i = 0; i < n; i++)
+	{
+		scanf("%d",&a[i]);
+		sum = sum + a[i];
+	}
+	printf("Enter the number of bits to represent the data: ");
+	scanf("%d", &b);
+	a[n] = 0;
+	//displaying data at sender's side
+	printf("At senders side:\n");
+	for (i = 0; i <= n; i++)
+		printf("%d ", a[i]);
+	//displaying their sum
+	printf("\nSum = %d\n", sum);
+	bin(sum);
+	if (len > b)
+	{
+		for (i = len - b; i < len; i++)
+		{
+			num1[l1] = b1[i];
+			l1++;
+		}
+		l2 = l1;
+		for (i = len - b; i >= 0; i--){
+			num2[l2] = b1[i];
+			l2--;
+		}	
+	}
+	addBinary(num1, num2);
+	printf("Wrapped sum = ");
+	for (i = 0; i < l1; i++)
+		printf("%d", wsum[i]);
+	comp(wsum);
+	printf("\nChecksum = ");
+	for (i = 0; i < l1; i++)
+		printf("%d", csum[i]);
+	dec();
+	printf("\nDecimal value of checksum= %d\n", deci);
+	printf("\nAt receivers side:\n");
+	a[n] = deci;
+	for (i = 0; i <= n; i++)
+		printf("%d ", a[i]);
+	nsum = sum + deci;
+	printf("\nNew sum = %d\n", nsum);
+	len = 0;
+	l1 = 0;
+	l2 = 0;
+	for (i = 0; i < len; i++)
+		b1[i] = 0;
+	bin(nsum);
+	if (len > b){
+		for (i = len - b; i < len; i++){
+			num1[l1] = b1[i];
+			l1++;	
+		}
+		l2 = l1;
+		for (i = len - b; i >= 0; i--){
+			num2[l2] = b1[i];
+			l2--;
+		}
+	}
+	addBinary(num1, num2);
+	printf("\nWrapped sum = ");
+	for (i = 0; i < l1; i++)
+		printf("%d", b1[i]);
+	printf("\n");
+	comp(b1);
+	printf("\n");
+	for (i = 0; i < l1; i++){
+		printf("%d", csum[i]);
+		if (csum[i] == 0)
+			c++;
+	}
+	if (c == l1)
+		printf("\nNo error\n");
+	else
+		printf("\nerror\n");	
+}
+
+void bin(int n) {
+	int i = 0, rem, bi[10] = {0}, j, k;
+	while (n != 0){
+		rem = n % 2;
+		n = n / 2;
+		bi[i] = rem;
+		i++;
+	}
+	j = i - 1;
+	for (k = 0; k <= i; k++){
+		b1[k] = bi[j];
+		j--;
+	}
+	len = i;
+}
+
+void addBinary(int a[], int b[]){
+	int i, c = 0;
+	for (i = l1; i >= 0; i--){
+		wsum[i] = ((a[i] ^ b[i]) ^ c);
+		c = ((a[i] & b[i]) | (a[i] & c)) | (b[i] & c);
+	}
+}
+
+void comp(int a[]){
+	int i = 0;
+	for (i = 0; i < l1; i++){
+		a[i] = (a[i] == 1) ? 0 : 1;
+	}
+	for (i = 0; i < l1; i++)
+		csum[i] = a[i];
+}
+
+void dec(){
+	int i, j = 0;
+	for (i = l1 - 1; i >= 0; i--){
+		deci = deci + (csum[i] * pow(2, j));
+		j++;
+	}
+}
